@@ -14,6 +14,7 @@ const MONGOLAB_URL = process.env.MONGOLAB_URL;
 
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth.routes');
+const { requireAuth } = require('./middleware/auth.middleware');
 
 var app = express();
 
@@ -43,6 +44,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.get("/jwtid", requireAuth, (req, res) => {
+  res.status(200).send(res.locals.user._id)
+});
 
 app.use('/', indexRouter);
 app.use('/api/auth', authRouter);

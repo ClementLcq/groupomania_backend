@@ -5,6 +5,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+const limiter = require('./middleware/rateLimiter.middleware');
+
 // Utilisation dotenv
 const dotenv = require('dotenv');
 dotenv.config();
@@ -12,12 +14,18 @@ const MONGOLAB_USERNAME = process.env.MONGOLAB_USERNAME;
 const MONGOLAB_PASSWORD = process.env.MONGOLAB_PASSWORD;
 const MONGOLAB_URL = process.env.MONGOLAB_URL;
 
+//Installation sécurité
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth.routes');
 const postsRouter = require('./routes/posts.routes');
 const { requireAuth } = require('./middleware/auth.middleware');
 
 var app = express();
+app.use(helmet());
+app.use(mongoSanitize());
 
 // Connection MongoDB
 mongoose.connect(`mongodb+srv://${MONGOLAB_USERNAME}:${MONGOLAB_PASSWORD}@${MONGOLAB_URL}`, {

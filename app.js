@@ -20,7 +20,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth.routes');
-const postsRouter = require('./routes/posts.routes');
+var postsRouter = require('./routes/posts.routes');
 const { requireAuth } = require('./middleware/auth.middleware');
 
 var app = express();
@@ -63,10 +63,10 @@ app.use('/', indexRouter);
 app.use('/api/auth', authRouter);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+// // catch 404 and forward to error handler
+// app.use(function(req, res, next) {
+//   next(createError(404));
+// });
 
 // error handler
 app.use(function(err, req, res, next) {

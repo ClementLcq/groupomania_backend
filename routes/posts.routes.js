@@ -1,19 +1,20 @@
 const express = require('express');
-const router = express.Router();
+var router = express.Router();
 
 // Controlleurs et middlewaires
 
 const postCtrl = require('../controllers/posts.controller');
-const auth = require('../middleware/auth.middleware');
+// const auth = require('../middleware/auth.middleware');
 const multer = require("../middleware/multerFunctions");
 
 
 // Routes CRUD
 
-router.post("/trending", auth, multer, postCtrl.createPost);
-router.get('/trending', auth, postCtrl.displayPosts);
-router.delete("/trending/:id", auth, postCtrl.deletePost);
-router.put("/trending/:id", auth, multer, postCtrl.modifyPost);
+router.get("/", postCtrl.displayPosts);
+router.post("/", multer, postCtrl.createPost);
+router.put("/:id", postCtrl.modifyPost);
+router.delete("/:id", postCtrl.deletePost);
+
 
 
 module.exports = router;

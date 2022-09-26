@@ -4,13 +4,13 @@ var router = express.Router();
 // Controlleurs et middlewaires
 
 const postCtrl = require('../controllers/posts.controller');
-// const auth = require('../middleware/auth.middleware');
+const auth = require('../middleware/auth.middleware');
 const multer = require("../middleware/multerFunctions");
 
 
 // Routes CRUD
 
-router.get("/", postCtrl.displayPosts);
+router.get("/", auth.requireAuth, postCtrl.displayPosts);
 router.post("/", multer, postCtrl.createPost);
 router.put("/:id", postCtrl.modifyPost);
 router.delete("/:id", postCtrl.deletePost);

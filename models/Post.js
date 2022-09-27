@@ -4,11 +4,12 @@ const mongoose = require('mongoose');
 
 const postSchema = mongoose.Schema({
     userEmail: { type: String, required: true },
-    time : { type : Date, default: Date.now },
-    description: { type: String, required: true },
+   description: { type: String, required: true },
     imageUrl: { type: String, required: true },
     likes: { type: Number, required: false, default: 0 },
     usersLiked: { type: [String] },
-});
+    }, 
+    { timestamps: true }
+);
 
 module.exports = mongoose.model("posts", postSchema);

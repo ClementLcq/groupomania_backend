@@ -43,6 +43,7 @@ exports.login = (req, res, next) => {
                         } else {
                             res.status(200).json({
                                 userId: user._id,
+                                userEmail : user.email,
                                 token: jwt.sign({ userId: user._id },
                                     TOKEN_SECRET, { expiresIn: EXP_TOKEN }
                                 )

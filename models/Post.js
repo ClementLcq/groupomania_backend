@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 // Création du schéma Post attendu par le front
 
 const postSchema = mongoose.Schema({
-    userId: { type: String, required: true },
+    userEmail: { type: String, required: true },
     time : { type : Date, default: Date.now },
     description: { type: String, required: true },
     imageUrl: { type: String, required: true },

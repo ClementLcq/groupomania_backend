@@ -13,17 +13,36 @@ exports.displayPosts = (req, res, next) => {
 
 // Créer un post
 
-exports.createPost = (req, res, next) => {
-    const postObject = JSON.parse(req.body.post);
-    delete postObject._id;
-    const post = new Post({
-        ...postObject,
-        imageUrl : `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    });
-    post.save()
-        .then(() => res.status(201).json({ message: 'Objet enregistré' }))
-        .catch(error => res.status(400).json({ error }));
-};
+// exports.createPost = (req, res, next) => {
+//     console.log(JSON.parse(req.body.post));
+//     const postObject = JSON.parse(req.body.post);
+//     delete postObject._id;
+//     const post = new Post({
+//         ...postObject,
+//         imageUrl : `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+//     });
+//     post.save()
+//         .then(() => res.status(201).json({ message: 'Objet enregistré' }))
+//         .catch(error => res.status(400).json({ error }));
+// };
+
+exports.createPost = async (req, res) => {
+    const { userId, description } = req.body;
+    const imageURL = req.file
+      ? `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
+      : "";
+    await Post.create({
+      userId: userId,
+      description: description,
+      image: imageURL,
+    })
+      .then(() => {
+        res.status(201).json({ message: "Nouveau Post créé !" });
+      })
+      .catch((error) => {
+        res.status(400).json({ error });
+      });
+  };
 
 // Modifier un post
 

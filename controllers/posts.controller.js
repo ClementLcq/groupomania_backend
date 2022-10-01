@@ -6,25 +6,48 @@ const fs = require('fs');
 // Afficher toutes les posts
 
 exports.displayPosts = (req, res, next) => {
-    Post.find()
+    Post.aggregate([
+        { "$lookup": {
+          "from": "users",
+          "localField": "userId",
+          "foreignField": "_id",
+          "as": "User"
+        }}
+      ])
+        .sort({createdAt: -1})
         .then(posts => res.status(200).json(posts))
         .catch(error => res.status(400).json({ error }));
 };
 
 // Créer un post
 
+
 exports.createPost = (req, res, next) => {
-    console.log(JSON.parse(JSON.stringify(req.body)));
+    // console.log(JSON.parse(JSON.stringify(req.body)));
     const postObject = JSON.parse(JSON.stringify(req.body));
     delete postObject._id;
     const post = new Post({
         ...postObject,
-        imageUrl : `${req.protocol}://${req.get('host')}/images/${req.file}`
+        imageUrl : req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : null,
     });
     post.save()
         .then(() => res.status(201).json({ message: 'Objet enregistré' }))
         .catch(error => res.status(400).json({ error }));
 };
+
+
+// exports.createPost = (req, res, next) => {
+//     // console.log(JSON.parse(JSON.stringify(req.body)));
+//     const content = req.body.post;
+//     const post = new Post({
+//         userId : req.auth.userId,
+//         content : content,
+//         imageUrl : `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+//     });
+//     post.save()
+//         .then(() => res.status(201).json({ message: 'Objet enregistré' }))
+//         .catch(error => res.status(400).json({ error }));
+// };
 
 // exports.createPost = async (req, res) => {
 //     const { userId, description } = req.body;

@@ -10,13 +10,13 @@ passwordSchema
     .is()
     .min(8) // 8 carac mini
     .is()
-    .max(16) // 16 carac max
+    .max(22) // 16 carac max
     .has()
     .uppercase() // au moins une majuscule
     .has()
     .lowercase() // au moins une minuscule
     .has()
-    .digits(2) // 2 chiffres mini
+    .digits(1) // 1 chiffres mini
     .has()
     .not()
     .spaces() // Pas d'espace

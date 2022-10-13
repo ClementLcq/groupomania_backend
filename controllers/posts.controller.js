@@ -19,6 +19,20 @@ exports.displayPosts = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 };
 
+// Afficher un seul post
+
+exports.getOnePost = (req, res, next) => {
+    Post.findOne({ _id: req.params.id })
+        .then(post => {
+            if (post == null) {
+                res.status(404).json({ message: "Le post n'existe pas" });
+            } else {
+                res.status(200).json(post)
+            }
+        })
+        .catch(error => res.status(404).json({ error }));
+};
+
 // Créer un post
 
 

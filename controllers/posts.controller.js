@@ -181,7 +181,7 @@ exports.likePost = (req, res, next) => {
                         .catch(error => res.status(400).json({ error }));
                     break;
                 default:
-                    return res.status(500).json({ error });
+                    return res.status(500).json({ messge :'erreur 500' });
             }
         })
         .catch(error => res.status(500).json({ error }))

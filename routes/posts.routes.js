@@ -14,7 +14,8 @@ router.get("/", auth.requireAuth, postCtrl.displayPosts);
 router.post("/", auth.requireAuth, multer, postCtrl.createPost);
 router.get("/:id", auth.requireAuth, postCtrl.getOnePost);
 router.put("/:id", auth.requireAuth, multer, postCtrl.modifyPost);
-router.delete("/:id", auth.requireAuth, multer, postCtrl.deletePost);
+router.delete("/:id", auth.requireAuth, postCtrl.deletePost);
+router.post("/id/like", auth.requireAuth, postCtrl.likePost);
 
 
 

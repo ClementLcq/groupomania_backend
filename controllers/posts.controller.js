@@ -127,3 +127,62 @@ exports.deletePost = (req, res, next) => {
         })
         .catch(error => res.status(500).json({ error }));
 };
+
+// liker un post
+exports.likePost = (req, res, next) => {
+    // Récupération de la sauce avec params.id
+    Post.findOne({ _id: req.params.id })
+        .then(post => {
+            switch (req.body.like) {
+                // Cas #1 : si l'utilisateur dislike le post
+                case -1:
+                    Post.updateOne({ _id: req.params.id }, {
+                            $inc: { dislikes: 1 },
+                            $push: { usersDisliked: req.body.userId },
+                            _id: req.params.id
+                        })
+                        .then(() => res.status(201).json({ message: 'Mince, nous n\'aimez plus ce post' }))
+                        .catch(error => res.status(400).json({ error }))
+                    break;
+
+                    // Cas #2 : si la valeur like ou dislike est différente de 0
+                case 0:
+                    // Cas #2-A : si le post est déjà liké
+                    if (post.usersLiked.find(user => user === req.body.userId)) {
+                        Post.updateOne({ _id: req.params.id }, {
+                                $inc: { likes: -1 },
+                                $pull: { usersLiked: req.body.userId },
+                                _id: req.params.id
+                            })
+                            .then(() => res.status(201).json({ message: 'Votre avis a bien été modifié, merci' }))
+                            .catch(error => res.status(400).json({ error }))
+                    }
+
+                    // Cas #2-B : Si le post est déjà disliké
+                    if (post.usersDisliked.find(user => user === req.body.userId)) {
+                        Post.updateOne({ _id: req.params.id }, {
+                                $inc: { dislikes: -1 },
+                                $pull: { usersDisliked: req.body.userId },
+                                _id: req.params.id
+                            })
+                            .then(() => res.status(201).json({ message: 'Votre avis a bien été modifié, merci' }))
+                            .catch(error => res.status(400).json({ error }));
+                    }
+                    break;
+
+                    // Cas #3 : si l'utilisateur like le post
+                case 1:
+                    Post.updateOne({ _id: req.params.id }, {
+                            $inc: { likes: 1 },
+                            $push: { usersLiked: req.body.userId },
+                            _id: req.params.id
+                        })
+                        .then(() => res.status(201).json({ message: 'Super, vous adorez ce post!' }))
+                        .catch(error => res.status(400).json({ error }));
+                    break;
+                default:
+                    return res.status(500).json({ error });
+            }
+        })
+        .catch(error => res.status(500).json({ error }))
+}

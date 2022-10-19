@@ -130,7 +130,7 @@ exports.deletePost = (req, res, next) => {
 
 // liker un post
 exports.likePost = (req, res, next) => {
-    // Récupération de la sauce avec params.id
+    // Récupération du post avec params.id
     Post.findOne({ _id: req.params.id })
         .then(post => {
             switch (req.body.like) {

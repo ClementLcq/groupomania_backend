@@ -94,15 +94,15 @@ exports.modifyPost = (req, res, next) => {
         .then((post) => {
             if (post == null) {
                 res.status(404).json({ message: "Le post n'existe pas" });
-            } else if (post.userId != req.auth.userId) {
-                res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier ce post" });
-            } else {
+            } else if ((post.userId == req.auth.userId) || req.auth.isAdmin ) {
                 const filename = post.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
                     Post.updateOne({ _id: req.params.id }, {...postObject, _id: req.params.id })
                         .then(() => res.status(200).json({ message: 'Objet supprimé' }))
                         .catch(error => res.status(400).json({ error }));
                 });
+            } else {
+                res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier ce post" });
             }
         });
 }
@@ -114,15 +114,15 @@ exports.deletePost = (req, res, next) => {
         .then(post => {
             if (post == null) {
                 res.status(404).json({ message: "Le post n'existe pas" });
-            } else if (post.userId != req.auth.userId) {
-                res.status(403).json({ message: "Vous n'êtes pas autorisé à supprimer le post" });
-            } else {
+            } else if ((post.userId == req.auth.userId) || req.auth.isAdmin ) {
                 const filename = post.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
                     Post.deleteOne({ _id: req.params.id })
                         .then(() => res.status(200).json({ message: 'Objet supprimé' }))
                         .catch(error => res.status(400).json({ error }));
                 });
+            } else {
+                res.status(403).json({ message: "Vous n'êtes pas autorisé à supprimer le post" });
             }
         })
         .catch(error => res.status(500).json({ error }));
@@ -130,78 +130,78 @@ exports.deletePost = (req, res, next) => {
 
 // liker un post
 
-// exports.likePost = async (req, res) => {
-//     //Get the post with params
-//     const post = await Post.findById(req.params.id);
-//     if (req.auth.userId !== post.userId) {
-//       //Check if user allready like the post, if not, insert userId in likes array
-//       //else pull-it from likes array
-//       if (!post.likes.includes(req.auth.userId)) {
-//         await post.updateOne({ $push: { likes: req.auth.userId } });
-//         res.status(200).json("Like enregistré !");
-//       } else {
-//         await post.updateOne({ $pull: { likes: req.auth.userId } });
-//         res.status(200).json("Like retiré !");
-//       }
-//     } else {
-//       res.status(401).json("Vous ne pouvez pas liker vos posts !");
-//     }
-//   };
+exports.likePost = async (req, res) => {
+    //Get the post with params
+    const post = await Post.findById(req.params.id);
+    
+      //Check if user allready like the post, if not, insert userId in likes array
+      //else pull-it from likes array
+      if (!post.usersLiked.includes(req.auth.userId)) {
+        await post.updateOne({ $push: { usersLiked: req.auth.userId } });
+        const postUpdated = await Post.findById(req.params.id);
+        res.status(200).json(postUpdated);
+      } else {
+        await post.updateOne({ $pull: { usersLiked: req.auth.userId } });
+        const postUpdated = await Post.findById(req.params.id);
+        res.status(200).json(postUpdated);
+      }
+    
+  };
 
-exports.likePost = (req, res, next) => {
-    // Récupération du post avec params.id
-    Post.findOne({ _id: req.params.id })
-        .then(post => {
-            switch (req.body.like) {
-                // Cas #1 : si l'utilisateur dislike le post
-                case -1:
-                    Post.updateOne({ _id: req.params.id }, {
-                            $inc: { dislikes: 1 },
-                            $push: { usersDisliked: req.body.userId },
-                            _id: req.params.id
-                        })
-                        .then(() => res.status(201).json({ message: 'Mince, nous n\'aimez plus ce post' }))
-                        .catch(error => res.status(400).json({ error }))
-                    break;
+// exports.likePost = (req, res, next) => {
+//     // Récupération du post avec params.id
+//     Post.findOne({ _id: req.params.id })
+//         .then(post => {
+//             switch (req.body.like) {
+//                 // Cas #1 : si l'utilisateur dislike le post
+//                 case -1:
+//                     Post.updateOne({ _id: req.params.id }, {
+//                             $inc: { dislikes: 1 },
+//                             $push: { usersDisliked: req.body.userId },
+//                             _id: req.params.id
+//                         })
+//                         .then(() => res.status(201).json({ message: 'Mince, nous n\'aimez plus ce post' }))
+//                         .catch(error => res.status(400).json({ error }))
+//                     break;
 
-                    // Cas #2 : si la valeur like ou dislike est différente de 0
-                case 0:
-                    // Cas #2-A : si le post est déjà liké
-                    if (post.usersLiked.find(user => user === req.body.userId)) {
-                        Post.updateOne({ _id: req.params.id }, {
-                                $inc: { likes: -1 },
-                                $pull: { usersLiked: req.body.userId },
-                                _id: req.params.id
-                            })
-                            .then(() => res.status(201).json({ message: 'Votre avis a bien été modifié, merci' }))
-                            .catch(error => res.status(400).json({ error }))
-                    }
+//                     // Cas #2 : si la valeur like ou dislike est différente de 0
+//                 case 0:
+//                     // Cas #2-A : si le post est déjà liké
+//                     if (post.usersLiked.find(user => user === req.body.userId)) {
+//                         Post.updateOne({ _id: req.params.id }, {
+//                                 $inc: { likes: -1 },
+//                                 $pull: { usersLiked: req.body.userId },
+//                                 _id: req.params.id
+//                             })
+//                             .then(() => res.status(201).json({ message: 'Votre avis a bien été modifié, merci' }))
+//                             .catch(error => res.status(400).json({ error }))
+//                     }
 
-                    // Cas #2-B : Si le post est déjà disliké
-                    if (post.usersDisliked.find(user => user === req.body.userId)) {
-                        Post.updateOne({ _id: req.params.id }, {
-                                $inc: { dislikes: -1 },
-                                $pull: { usersDisliked: req.body.userId },
-                                _id: req.params.id
-                            })
-                            .then(() => res.status(201).json({ message: 'Votre avis a bien été modifié, merci' }))
-                            .catch(error => res.status(400).json({ error }));
-                    }
-                    break;
+//                     // Cas #2-B : Si le post est déjà disliké
+//                     if (post.usersDisliked.find(user => user === req.body.userId)) {
+//                         Post.updateOne({ _id: req.params.id }, {
+//                                 $inc: { dislikes: -1 },
+//                                 $pull: { usersDisliked: req.body.userId },
+//                                 _id: req.params.id
+//                             })
+//                             .then(() => res.status(201).json({ message: 'Votre avis a bien été modifié, merci' }))
+//                             .catch(error => res.status(400).json({ error }));
+//                     }
+//                     break;
 
-                    // Cas #3 : si l'utilisateur like le post
-                case 1:
-                    Post.updateOne({ _id: req.params.id }, {
-                            $inc: { likes: 1 },
-                            $push: { usersLiked: req.body.userId },
-                            _id: req.params.id
-                        })
-                        .then(() => res.status(201).json({ message: 'Super, vous adorez ce post!' }))
-                        .catch(error => res.status(400).json({ error }));
-                    break;
-                default:
-                    return res.status(500).json({ messge :'erreur 500' });
-            }
-        })
-        .catch(error => res.status(500).json({ error }))
-}
+//                     // Cas #3 : si l'utilisateur like le post
+//                 case 1:
+//                     Post.updateOne({ _id: req.params.id }, {
+//                             $inc: { likes: 1 },
+//                             $push: { usersLiked: req.body.userId },
+//                             _id: req.params.id
+//                         })
+//                         .then(() => res.status(201).json({ message: 'Super, vous adorez ce post!' }))
+//                         .catch(error => res.status(400).json({ error }));
+//                     break;
+//                 default:
+//                     return res.status(500).json({ messge :'erreur 500' });
+//             }
+//         })
+//         .catch(error => res.status(500).json({ error }))
+// }

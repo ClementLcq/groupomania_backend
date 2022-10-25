@@ -1,4 +1,7 @@
-GROUPOMANIA - Réseau social d'entreprise 👥
+**GROUPOMANIA - Réseau social d'entreprise 👥**
+**BACKEND**
+
+
 étape de mise en route :
 Initialisation du projet: 📁
 créer un dossier en local

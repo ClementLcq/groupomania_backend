@@ -21,33 +21,5 @@ ATTENTION, LE PORT DOIT ETRE DIFFERENT DE 3000
 Allez dans le terminal, vérifiez que vous êtes sur la racine du dossier et lancez :  
 npm run dev  
 
-
-
-se positionner sur le dossier frontend et lancer la commande :
-npm install
-
-Définition des Variables d'environnement : 📝
-Backend
-copier le fichier .env.example du dossier \backend
-le coller au même endroit puis renommer celui-ci par ".env"
-Ouvrir ce fichier .env et remplacer les variables par vos propres valeurs,ex:
-DATABASE_URL=mysql://root:monmotdepasse@localhost:8080/groupomania
-SECRET_KEY_SALTED = CleSecrete12
-PORT = 9000
-
-ATTENTION LE PORT DOIT ÊTRE DIFFERENT DE 3000
-
-Frontend
-copier le fichier .env.example du dossier \frontend
-le coller au même endroit puis renommer celui-ci par ".env"
-Ouvrir ce fichier .env et remplacer les variables par vos propres valeurs,ex:
-REACT_APP_API_URL= http://localhost:9000/
-
-ATTENTION le port doit correspondre avec celui choisit dans le backend (PORT)
-
-Lancement de l'application 🚀
-se positionner sur le dossier \backend et lancer : npm start
-
-se positionner sur le dossier \frontend et lancer : npm start
-
-l'application sera lancé sur http://localhost:3000
+**4. Allez sur le répertoire du frontend avec votre navigateur et lisez le Readme**  
+Frontend : https://github.com/ClementLcq/groupomania_frontend

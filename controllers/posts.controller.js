@@ -96,6 +96,10 @@ exports.deletePost = (req, res, next) => {
         .then(post => {
             if (post == null) {
                 res.status(404).json({ message: "Le post n'existe pas" });
+            } else if (post.imageUrl === null) { 
+                Post.deleteOne({ _id: req.params.id })
+                .then(() => res.status(200).json({ message: 'Objet supprimé' }))
+                .catch(error => res.status(400).json({ error }));
             } else if ((post.userId == req.auth.userId) || req.auth.isAdmin ) {
                 const filename = post.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
